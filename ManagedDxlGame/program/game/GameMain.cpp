@@ -14,7 +14,6 @@ void gameStart() {
 	GameManager::GetInstance(std::make_shared<SceneTitle>());
 	//GameManager::GetInstance(std::make_shared<ScenePlay>());
 
-	SetFontSize(50);
 }
 //------------------------------------------------------------------------------------------------------------
 // –ˆƒtƒŒ[ƒ€ŽÀs‚³‚ê‚Ü‚·
@@ -22,10 +21,6 @@ void gameMain(float delta_time) {
 
 	GameManager::GetInstance()->update(delta_time);
 
-	//DrawFpsIndicator({ 10, DXE_WINDOW_HEIGHT - 10, 0 }, delta_time);
-
-	/*SetFontSize(20);
-	DrawDefaultLightGuiController();*/
 }
 
 //------------------------------------------------------------------------------------------------------------

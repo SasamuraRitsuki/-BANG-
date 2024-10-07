@@ -193,6 +193,7 @@
     <ClCompile Include="program\game\scene\scene_play\gm_obj\Wall.cpp" />
     <ClCompile Include="program\game\scene\scene_play\GameScenePlay.cpp" />
     <ClCompile Include="program\game\scene\scene_play\result\Result.cpp" />
+    <ClCompile Include="program\game\scene\scene_play\SkyBox.cpp" />
     <ClCompile Include="program\game\scene\scene_play\tank\enemy_spawner\enemy\EnemyTank.cpp" />
     <ClCompile Include="program\game\scene\scene_play\tank\enemy_spawner\Spawner.cpp" />
     <ClCompile Include="program\game\scene\scene_play\tank\player\PlayerTank.cpp" />
@@ -272,6 +273,7 @@
     <ClInclude Include="program\game\scene\scene_play\gm_obj\Wall.h" />
     <ClInclude Include="program\game\scene\scene_play\GameScenePlay.h" />
     <ClInclude Include="program\game\scene\scene_play\result\Result.h" />
+    <ClInclude Include="program\game\scene\scene_play\SkyBox.h" />
     <ClInclude Include="program\game\scene\scene_play\tank\enemy_spawner\enemy\EnemyTank.h" />
     <ClInclude Include="program\game\scene\scene_play\tank\enemy_spawner\Spawner.h" />
     <ClInclude Include="program\game\scene\scene_play\tank\player\PlayerTank.h" />

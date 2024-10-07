@@ -16,9 +16,9 @@ Bullet::Bullet(const tnl::Vector3& spawn_pos, const tnl::Vector3& move_dir,const
 	move_dir_ = move_dir;
 
 	//弾が出てくるところは少し前側
-	blt_pos_ = spawn_pos + (move_dir * BULLET_SPEED * 7);
+	blt_pos_ = spawn_pos + (move_dir * BULLET_SPEED * BULLET_FORWARD_OFFSET);
 	//弾の方向を撃った方向に
-	mesh_->rot_ = tnl::Quaternion::RotationAxis({ 0, 1, 0 }, tnl::ToRadian(static_cast<float>(dir_value)));
+	mesh_->rot_ = tnl::Quaternion::RotationAxis(TANK_AXIS, tnl::ToRadian(static_cast<float>(dir_value)));
 
 	mesh_->setCullingMode(DX_CULLING_RIGHT);
 
@@ -34,7 +34,7 @@ Bullet::~Bullet() {
 }
 
 void Bullet::update(float delta_time) {
-
+	//弾の更新処理
 	blt_pos_ += move_dir_ * BULLET_SPEED * static_cast<float>(blt_dir_);
 
 	//メッシュに反映

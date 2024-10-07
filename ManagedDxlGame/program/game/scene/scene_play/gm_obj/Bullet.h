@@ -28,10 +28,14 @@ private:
 
 	//弾の形
 	const tnl::Vector3 BULLET_FORM = { 1.0f, 1.0f, 2.0f };
+	//戦車の回転の軸
+	const tnl::Vector3 TANK_AXIS = { 0.0f, 1.0f, 0.0f };
 	//弾の大きさ
-	const float BULLET_SIZE = 15;
+	const float BULLET_SIZE = 15.0f;
 	//弾速
-	const float BULLET_SPEED = 10;
+	const float BULLET_SPEED = 10.0f;
+	//弾の前方オフセット
+	const float BULLET_FORWARD_OFFSET = 7.0f;
 	//弾の向き
 	const int BULLET_DIR = 1;
 	//反射後の弾の向き

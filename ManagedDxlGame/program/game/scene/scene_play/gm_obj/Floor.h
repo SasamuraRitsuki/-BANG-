@@ -41,15 +41,15 @@ public:
 
 private:
 	//床の大きさ
-	const float FLOOR_SIZE = 1000;
+	const float FLOOR_SIZE = 1000.0f;
 	//動く床の大きさ
-	const float MOVE_FLOOR_SIZE = 250;
+	const float MOVE_FLOOR_SIZE = 250.0f;
 
 	//--------------------------------床1(手前)-----------------------------------------
 	//床の形
-	const tnl::Vector3 FLOOR1_FORM = { 1.7f, 0.25f, 1 };
+	const tnl::Vector3 FLOOR1_FORM = { 1.7f, 0.25f, 1.0f };
 	//床の座標
-	tnl::Vector3 floor1_pos_ = { 650,-155,300 };
+	tnl::Vector3 floor1_pos_ = { 650.0f, -155.0f, 300.0f };
 	//判定用の床の大きさ
 	tnl::Vector3 floor1_size_v;
 	//メッシュ
@@ -58,7 +58,7 @@ private:
 	//床の形
 	const tnl::Vector3 FLOOR2_FORM = { 1.7f, 0.25f, 0.575f };
 	//床の座標
-	tnl::Vector3 floor2_pos_ = { 650,-155,2012.4f };
+	tnl::Vector3 floor2_pos_ = { 650.0f, -155.0f, 2012.4f };
 	//判定用の床の大きさ
 	tnl::Vector3 floor2_size_v;
 	//メッシュ
@@ -66,7 +66,7 @@ private:
 
 	//--------------------------------動く床-----------------------------------------
 	//床の形
-	const tnl::Vector3 MOVE_FLOOR_FORM = { 1, 0.25f, 1 };
+	const tnl::Vector3 MOVE_FLOOR_FORM = { 1.0f, 0.25f, 1.0f };
 	//床がどのくらい動くか
 	const int MOVE_FLOOR_DISTANCE = 600;
 	//簡単モードの時、床がどれくらいの速さで動くか
@@ -78,23 +78,23 @@ private:
 	//床がどれくらいの速さで動くか
 	float move_floor_speed_;
 	//経過時間
-	float elapsed_ = 0;
+	float flashed_value_ = 0;
 	//--------------------------------動く床1(手前)-----------------------------------------
 	//床の初期座標
-	tnl::Vector3 MOVE_FLOOR1_POS = { 650,-61,1050 };
+	tnl::Vector3 MOVE_FLOOR1_POS = { 650.0f,-61.0f,1050.0f };
 	//床の座標
 	tnl::Vector3 move_floor1_pos_ = MOVE_FLOOR1_POS;
 	//初期位置から動いた動く床1の移動距離
-	float delta_move_floor1_distance_ = 0;
+	float delta_move_floor1_distance_ = 0.0f;
 	//メッシュ
 	Shared<dxe::Mesh> move_floor1_mesh_ = nullptr;
 	//--------------------------------動く床2(奥)-----------------------------------------
 	//床の初期座標
-	tnl::Vector3 MOVE_FLOOR2_POS = { 650,-61,1400 };
+	tnl::Vector3 MOVE_FLOOR2_POS = { 650.0f,-61.0f,1400.0f };
 	//床の座標
 	tnl::Vector3 move_floor2_pos_ = MOVE_FLOOR2_POS;
 	//初期位置から動いた動く床2の移動距離
-	float delta_move_floor2_distance_ = 0;
+	float delta_move_floor2_distance_ = 0.0f;
 	//メッシュ
 	Shared<dxe::Mesh> move_floor2_mesh_ = nullptr;
 

@@ -19,9 +19,10 @@ public:
 private:
 	static const int ENEMY_MAX = 3;
 	//敵の座標
-	const tnl::Vector3 FIRST_ENEMY_POS[ENEMY_MAX] = { {1200,0.1f,500},{ 200,0.1f,2000 },{ 1000,0.1f,2000 } };
+	const tnl::Vector3 FIRST_ENEMY_POS[ENEMY_MAX] = { {1200.0f,0.1f,500.0f},
+		{ 200.0f,0.1f,2000.0f },{ 1000.0f,0.1f,2000.0f } };
 	//敵の初期向き
-	const float ENEMY_ANGLE[ENEMY_MAX] = { 270 ,180 ,180 };
+	const float ENEMY_ANGLE[ENEMY_MAX] = { 270.0f ,180.0f ,180.0f };
 
 	//ゲームクリアの判定
 	bool cleared_ = false;

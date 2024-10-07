@@ -29,7 +29,8 @@ SceneResult::~SceneResult() {
 
 void SceneResult::update(float delta_time) {
 	timeleft_ += delta_time;
-	elapsed_ = sin(timeleft_ * 5);
+	//点滅用の計算
+	flashed_value_ = sin(timeleft_ * FLASHED_VALUE);
 
 	//左クリックでタイトル画面へ
 	if (tnl::Input::IsMouseTrigger(eMouseTrigger::IN_LEFT)) {
@@ -45,17 +46,21 @@ void SceneResult::draw() {
 	//後ろの黒い薄い背景の描画
 	DrawExtendGraph(0, 0,
 		DXE_WINDOW_WIDTH, DXE_WINDOW_HEIGHT, back_gfx_, false);
-	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 255);
+	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, TRANSPARENCY_MAX);
+
 	//結果の文字の描画
 	SetFontSize(RESULT_FONTSIZE);
 	if (cleared_) {
-		DrawStringEx(CLEAR_TEXT_POS.x, CLEAR_TEXT_POS.y, TEXT_COLOR, "ゲームクリア");
+		//クリアテキストの表示
+		DrawStringEx(CLEAR_TEXT_POS.x, CLEAR_TEXT_POS.y, TEXT_COLOR, CLEAR_TEXT.c_str());
 	}
 	else {
-		DrawStringEx(OVER_TEXT_POS.x, OVER_TEXT_POS.y, TEXT_COLOR, "ゲームオーバー");
+		//ゲームオーバーテキストの表示
+		DrawStringEx(OVER_TEXT_POS.x, OVER_TEXT_POS.y, TEXT_COLOR, OVER_TEXT.c_str());
 	}
 	SetFontSize(NORMAL_FONTSIZE);
-	if (elapsed_ > 0) {
-		DrawStringEx(CLICK_TEXT_POS.x, CLICK_TEXT_POS.y, TEXT_COLOR, "左クリックを　押してネ");
+	if (flashed_value_ > FLASHED_CENTER_VALUE) {
+		//クリックテキストの表示
+		DrawStringEx(CLICK_TEXT_POS.x, CLICK_TEXT_POS.y, TEXT_COLOR, CLICK_TEXT.c_str());
 	}
 }

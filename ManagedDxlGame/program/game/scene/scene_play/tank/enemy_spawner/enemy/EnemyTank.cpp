@@ -101,11 +101,11 @@ bool EnemyTank::seqNotShooting(float delta_time) {
 	//-------------------------------メッシュの更新-----------------------------------------
 	//向き
 	mesh_->rot_ = tnl::Quaternion::RotationAxis(
-		{ 0, 1, 0 }, tnl::ToRadian(static_cast<float> (dir_angle_)));
+		TANK_AXIS, tnl::ToRadian(static_cast<float> (dir_angle_)));
 	//進み
 	//進む指令が出ている時
 	if (go_judge_) {
-		move_vel_ += tnl::Vector3::TransformCoord({ 0, 0, 1.0f }, mesh_->rot_);
+		move_vel_ += tnl::Vector3::TransformCoord(TANK_DIR, mesh_->rot_);
 	}
 	//質量と摩擦の計算
 	tnl::EasyAdjustObjectVelocity(CENTROID_RADIUS, MASS, FRICTION,
@@ -130,10 +130,10 @@ bool EnemyTank::seqShooting(float delta_time) {
 		//自機との角度を計算
 		AngleCalcToTank();
 		//弾の向きを自機に向ける
-		tnl::Vector3 move_dir = tnl::Vector3::TransformCoord({ 0,0,1 },
-			tnl::Quaternion::RotationAxis({ 0, 1, 0 }, tnl::ToRadian(static_cast<float>(angle_to_tank_))));
+		tnl::Vector3 move_dir = tnl::Vector3::TransformCoord(TANK_DIR,
+			tnl::Quaternion::RotationAxis(TANK_AXIS, tnl::ToRadian(static_cast<float>(angle_to_tank_))));
 		//向きを自機に向ける
-		mesh_->rot_ = tnl::Quaternion::RotationAxis({ 0, 1, 0 }, tnl::ToRadian(static_cast<float>(angle_to_tank_)));
+		mesh_->rot_ = tnl::Quaternion::RotationAxis(TANK_AXIS, tnl::ToRadian(static_cast<float>(angle_to_tank_)));
 		//弾生成
 		bullet_.emplace_back(std::make_shared<Bullet>(tank_pos_, move_dir, angle_to_tank_, true));
 		//効果音
@@ -160,12 +160,12 @@ bool EnemyTank::seqNormal(float delta_time) {
 		//効果音
 		PlaySoundMem(damage_snd_, DX_PLAYTYPE_BACK);
 		//HPが1以上ならダメージ中に遷移
-		if (tank_hp_ > 0) {
+		if (tank_hp_ > TANK_DAED_HP) {
 			sequence_state_.change(&EnemyTank::seqDamaged);
 		}
 	}
 	//hpがなくなったら死亡中へ遷移
-	if (tank_hp_ <= 0) {
+	if (tank_hp_ <= TANK_DAED_HP) {
 		sequence_state_.change(&EnemyTank::seqDead);
 	}
 	return true;
@@ -199,7 +199,7 @@ bool EnemyTank::seqDamaged(float delta_time) {
 		sequence_state_.change(&EnemyTank::seqNormal);
 	}
 	//hpがなくなったら死亡中へ遷移
-	if (tank_hp_ <= 0) {
+	if (tank_hp_ <= TANK_DAED_HP) {
 		sequence_state_.change(&EnemyTank::seqDead);
 	}
 	return true;
@@ -231,7 +231,7 @@ void EnemyTank::UpdateAliveTank(float delta_time) {
 void EnemyTank::draw(Shared<dxe::Camera> camera) {
 	//現在のカメラ位置から見たHPバーの位置を出す
 	screen_hp_bar_pos_ = tnl::Vector3::ConvertToScreen(
-		{ tank_pos_.x - (HP_BAR_MAX / 2), 100, tank_pos_.z },
+		{ tank_pos_.x - HP_BAR_HALF, HP_BAR_HEIGHT, tank_pos_.z },
 		DXE_WINDOW_WIDTH,
 		DXE_WINDOW_HEIGHT,
 		camera->view_,
@@ -251,10 +251,10 @@ void EnemyTank::draw(Shared<dxe::Camera> camera) {
 	int screen_hp_bar_pos_y = static_cast<int>(screen_hp_bar_pos_.y);
 	//背景の黒いバー
 	DrawExtendGraph(screen_hp_bar_pos_x, screen_hp_bar_pos_y,
-		screen_hp_bar_pos_x + static_cast<int>(HP_BAR_MAX), screen_hp_bar_pos_y + 10, hp_back_gfx_, false);
+		screen_hp_bar_pos_x + BAR_WIDTH.x, screen_hp_bar_pos_y + BAR_WIDTH.y, hp_back_gfx_, false);
 	//緑バー
 	DrawExtendGraph(screen_hp_bar_pos_x, screen_hp_bar_pos_y,
-		static_cast<int>(hp_bar_right_), screen_hp_bar_pos_y + 10, hp_gfx_, false);
+		static_cast<int>(hp_bar_right_), screen_hp_bar_pos_y + BAR_WIDTH.y, hp_gfx_, false);
 }
 
 void EnemyTank::RandomShotCount() {
@@ -267,14 +267,14 @@ void EnemyTank::RandomShotCount() {
 		shot_count_ = SHOT_COUNT_AVG_EASY;
 	}
 	//弾を撃つ間隔の抽選（-0.9から+1.0のランダムを取る）
-	shot_count_ += (((rand() % 20) + 1 - 10) * 0.1f);
+	shot_count_ += (((rand() % RANDOM_SHOT_RANGE) - RANDOM_SHOT_OFFSET) * RANDOM_SHOT_SCALE);
 }
 
 void EnemyTank::RandomDirChange() {
 	//向きをランダムで変える
-	dir_value_ = static_cast<float>((rand() % 5) - 2) * RANDOM_DIR_POWER;
+	dir_value_ = static_cast<float>((rand() % RANDOM_DIR_RANGE) - RANDOM_DIR_OFFSET) * RANDOM_DIR_POWER;
 	//進むか止まるかをランダムで決める
-	go_judge_ = rand() % 2;
+	go_judge_ = rand() % RANDOM_GO_RANGE;
 }
 
 void EnemyTank::AngleCalcToTank() {
@@ -282,15 +282,16 @@ void EnemyTank::AngleCalcToTank() {
 	distance_to_tank_.x = static_cast<int>(tank_pos_.x - player_->getTankPos().x);
 	distance_to_tank_.y = static_cast<int>(tank_pos_.z - player_->getTankPos().z);
 	//自機との角度を計算
-	angle_to_tank_ = static_cast<int>(atan2(distance_to_tank_.x, distance_to_tank_.y) * (180.0 / M_PI)) + 180;
+	angle_to_tank_ = static_cast<int>(atan2(distance_to_tank_.x, distance_to_tank_.y) * RAD_TO_DEG) + ANGLE_OFFSET;
 }
 
 void EnemyTank::HpCalc() {
 	//減少しているHPバーが目指している長さ
-	float next_hp_bar_length = HP_BAR_MAX - ((tank_hp_ - TANK_HP) * -(HP_BAR_MAX / TANK_HP));
+	float next_hp_bar_length = static_cast<float>(BAR_WIDTH.x) -
+		((tank_hp_ - TANK_HP) * -(static_cast<float>(BAR_WIDTH.x) / TANK_HP));
 	if (is_hp_counting_) {
 		//hpの減り方を加速してから減速
-		hp_bar_length_ = tnl::SmoothLerp(hp_bar_start_right, next_hp_bar_length, HP_ELAPSED_LIMIT, hp_elapsed_, 0);
+		hp_bar_length_ = tnl::SmoothLerp(hp_bar_start_right, next_hp_bar_length, HP_ELAPSED_LIMIT, hp_elapsed_, SMOOTHING_ITERATIONS);
 	}
 	//HPバーのX座標を実際の座標の位置に
 	hp_bar_right_ = screen_hp_bar_pos_.x + hp_bar_length_;

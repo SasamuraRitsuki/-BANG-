@@ -1,4 +1,3 @@
-#define _USE_MATH_DEFINES 
 #include "../../../../../dxlib_ext/dxlib_ext.h"
 #include "PlayerTank.h"
 #include "../../../../gm_mgr/ResourceManager.h"
@@ -55,10 +54,10 @@ void PlayerTank::update(float delta_time) {
 		hp_elapsed_ += delta_time;
 	}
 	//減少しているHPバーが目指している長さ
-	float next_hp_bar_right = HP_GAUGE_POS.x + static_cast<float>((DXE_WINDOW_WIDTH * tank_hp_) / (3 * TANK_HP));
+	float next_hp_bar_right = HP_GAUGE_POS.x + static_cast<float>((DXE_WINDOW_WIDTH * tank_hp_) / (TANK_HP * TANK_HP));
 
 	//hpの減り方を加速してから減速
-	hp_bar_right_ = tnl::SmoothLerp(hp_bar_right_, next_hp_bar_right, HP_ELAPSED_LIMIT, hp_elapsed_, 0);
+	hp_bar_right_ = tnl::SmoothLerp(hp_bar_right_, next_hp_bar_right, HP_ELAPSED_LIMIT, hp_elapsed_, SMOOTHING_ITERATIONS);
 
 	if (hp_elapsed_ >= HP_ELAPSED_LIMIT) {
 		hp_calc_ = false;
@@ -90,9 +89,9 @@ bool PlayerTank::seqNormal(const float delta_time) {
 		AngleCalcToMouse();
 		//左クリックした時
 		if (tnl::Input::IsMouseTrigger(eMouseTrigger::IN_LEFT)) {
-			//弾の向きを自機に向ける
-			tnl::Vector3 move_dir = tnl::Vector3::TransformCoord({ 0,0,1 },
-				tnl::Quaternion::RotationAxis({ 0, 1, 0 }, tnl::ToRadian(static_cast<float> (angle_to_mouse_))));
+			//弾の向きを自機からマウス位置に向ける
+			tnl::Vector3 move_dir = tnl::Vector3::TransformCoord(TANK_DIR,
+				tnl::Quaternion::RotationAxis(TANK_AXIS, tnl::ToRadian(static_cast<float>(angle_to_mouse_))));
 			//弾の生成
 			bullet_.emplace_back(std::make_shared<Bullet>(tank_pos_, move_dir, angle_to_mouse_, false));
 			//効果音
@@ -182,9 +181,9 @@ bool PlayerTank::seqNormal(const float delta_time) {
 
 	if (tank_pos_.y <= DEAD_Y ||//落下したら
 		damaged_) {				//ダメージ受けたら
-		if (tank_hp_ > 1) {		//HPが0じゃない時は初期値に戻す
+		if (tank_hp_ > TANK_DAED_HP + 1) {		//HPが残り1じゃない時は初期値に戻す
 			tank_pos_ = FIRST_POS;
-			mesh_->rot_ = { 0, 0, 0 ,1 };
+			mesh_->rot_ = FIRST_ROT;
 			jump_value_ = 0;
 		}
 		move_floor1_state_.is_riding_ = false;
@@ -211,31 +210,29 @@ void PlayerTank::draw(Shared<dxe::Camera> camera) {
 		blt->draw(camera);
 	}
 
-	spin_bar_right_ = 0.5f * rolling_elapsed_ * (DXE_WINDOW_WIDTH / (3 * ROLLING_TIME)) + SPIN_GAUGE_POS.x;
-
 	//後ろの白い薄い背景
-	SetDrawBlendMode(DX_BLENDMODE_ALPHA, 100);
-	//上
+	SetDrawBlendMode(DX_BLENDMODE_ALPHA, TRANSPARENCY_WHITE_BACK);
+	//左上の弾の後ろ
 	DrawExtendGraph(UP_BACK_POS_FIRST.x, UP_BACK_POS_FIRST.y,
 		UP_BACK_POS_LAST.x, UP_BACK_POS_LAST.y, back_gfx_, false);
-	//下
+	//下のバーの後ろ
 	DrawExtendGraph(DOWN_BACK_POS_FIRST.x, DOWN_BACK_POS_FIRST.y,
 		DOWN_BACK_POS_LAST.x, DOWN_BACK_POS_LAST.y, back_gfx_, false);
-	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 255);
+	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, TRANSPARENCY_MAX);
 
 	//背景の黒いバー
 	DrawExtendGraph(HP_GAUGE_POS.x, HP_GAUGE_POS.y,
-		HP_GAUGE_POS.x + DXE_WINDOW_WIDTH / 3, HP_GAUGE_POS.y + 40, hp_back_gfx_, false);
+		HP_GAUGE_POS.x + BAR_WIDTH.x, HP_GAUGE_POS.y + BAR_WIDTH.y, hp_back_gfx_, false);
 	//緑バー
 	DrawExtendGraph(HP_GAUGE_POS.x, HP_GAUGE_POS.y,
-		static_cast<int>(hp_bar_right_), HP_GAUGE_POS.y + 40, hp_gfx_, false);
+		static_cast<int>(hp_bar_right_), HP_GAUGE_POS.y + BAR_WIDTH.y, hp_gfx_, false);
 
 	//背景の黒いバー
 	DrawExtendGraph(SPIN_GAUGE_POS.x, SPIN_GAUGE_POS.y,
-		SPIN_GAUGE_POS.x + DXE_WINDOW_WIDTH / 3, SPIN_GAUGE_POS.y + 40, hp_back_gfx_, false);
+		SPIN_GAUGE_POS.x + BAR_WIDTH.x, SPIN_GAUGE_POS.y + BAR_WIDTH.y, hp_back_gfx_, false);
 	//黄バー
 	DrawExtendGraph(SPIN_GAUGE_POS.x, SPIN_GAUGE_POS.y,
-		static_cast<int>(spin_bar_right_), SPIN_GAUGE_POS.y + 40, spin_gfx_, false);
+		static_cast<int>(spin_bar_right_), SPIN_GAUGE_POS.y + BAR_WIDTH.y, spin_gfx_, false);
 
 	//文字表示
 	DrawStringEx(HP_TEXT_POS.x, HP_TEXT_POS.y, TEXT_COLOR, "HP");
@@ -244,9 +241,9 @@ void PlayerTank::draw(Shared<dxe::Camera> camera) {
 
 	int blt_remains = BULLET_MAX - static_cast<int>(bullet_.size());
 	//左上の弾の描画
-	for (int i = 0; i < blt_remains; i++) {
-		DrawRotaGraph(static_cast<int>(BULLET_POS.x) + i * 64, static_cast<int>(BULLET_POS.y),
-			BULLET_POS.z, 0, bullet_gfx_, true);
+	for (int blt = 0; blt < blt_remains; blt++) {
+		DrawRotaGraph(BULLET_GFX_POS.x + blt * BULLET_WIDTH, BULLET_GFX_POS.y,
+			BULLET_GFX_SIZE_SCALE, BULLET_GFX_ANGLE, bullet_gfx_, true);
 	}
 
 }
@@ -258,42 +255,42 @@ void PlayerTank::LandingOnTheFloor() {
 
 void PlayerTank::DirChange() {
 	//入力されている方向への仮のベクトルの値
-	tnl::Vector2i move_dir_vector = {0,0};
+	tnl::Vector2i move_dir_vector = INITIAL_MOVE_VECTOR;
 	
 	//水平方向が押されている時
 	bool horizontal_input = false;
 	//垂直方向が押されている時
 	bool vertical_input = false;
 
-	//入力に応じて仮のベクトルの値を出す
-	//inputは平行な2方向が押されている時は、どちらにも動かさないようにする
-	//(左右に押されている時は動かさないが、3方向押されている時は動かすようにするため)
+// 入力に応じて仮の移動ベクトル (move_dir_vector) の値を更新する
+// 2つの平行な方向 (上下、左右) が同時に押されている場合は、動かないようにする。
+// ただし、3つ以上の方向が押されている場合は、移動を許可する。
 	if (tnl::Input::IsKeyDown(eKeys::KB_W)) {
-		move_dir_vector.x += 1;
+		move_dir_vector.x++;
 		vertical_input = !vertical_input;
 	}
 	if (tnl::Input::IsKeyDown(eKeys::KB_S)) {
-		move_dir_vector.x -= 1;
+		move_dir_vector.x--;
 		vertical_input = !vertical_input;
 	}
 	if (tnl::Input::IsKeyDown(eKeys::KB_D)) {
-		move_dir_vector.y += 1;
+		move_dir_vector.y++;
 		horizontal_input = !horizontal_input;
 	}
 	if (tnl::Input::IsKeyDown(eKeys::KB_A)) {
-		move_dir_vector.y -= 1;
+		move_dir_vector.y--;
 		horizontal_input = !horizontal_input;
 	}
 	//ベクトルの値から角度を出す。
-	int dir_angle = static_cast<int>(atan2(move_dir_vector.y, move_dir_vector.x) * (180.0 / M_PI));
+	int dir_angle = static_cast<int>(atan2(move_dir_vector.y, move_dir_vector.x) * RAD_TO_DEG);
 
 	//向いている方向への前進の値を出す
 	tnl::Quaternion now_rot_ = tnl::Quaternion::RotationAxis(
-		{ 0, 1, 0 }, tnl::ToRadian(static_cast<float>(dir_angle)));
+		TANK_AXIS, tnl::ToRadian(static_cast<float>(dir_angle)));
 
 	//左右か上下のボタンが押されてる時は前進処理
 	if (horizontal_input || vertical_input) {
-		move_vel_ += tnl::Vector3::TransformCoord({ 0, 0, 1.0f }, now_rot_);
+		move_vel_ += tnl::Vector3::TransformCoord(TANK_DIR, now_rot_);
 		//回転中は見た目はここでは動かさない
 		if (!rolling_) {
 			mesh_->rot_ = now_rot_;
@@ -302,10 +299,11 @@ void PlayerTank::DirChange() {
 }
 
 void PlayerTank::AngleCalcToMouse() {
-	mouse_pos_.x = tnl::Input::GetMousePosition().x - DXE_WINDOW_WIDTH / 2;
-	mouse_pos_.y = tnl::Input::GetMousePosition().y - DXE_WINDOW_HEIGHT / 2;
-
-	angle_to_mouse_ = static_cast<int>(atan2(mouse_pos_.y, mouse_pos_.x) * (180 / M_PI)) + 90;
+	//中心を0としてマウスの座標を取る
+	mouse_pos_.x = tnl::Input::GetMousePosition().x - WINDOW_HALF_WIDTH;
+	mouse_pos_.y = tnl::Input::GetMousePosition().y - WINDOW_HALF_HEIGHT;
+	//中心からマウスまでの角度
+	angle_to_mouse_ = static_cast<int>(atan2(mouse_pos_.y, mouse_pos_.x) * RAD_TO_DEG) + ANGLE_OFFSET;
 }
 
 void PlayerTank::TankRolling(float delta_time) {
@@ -322,7 +320,7 @@ void PlayerTank::TankRolling(float delta_time) {
 	if (rolling_) {
 		// y の変化
 		rolling_speed_ = easedTime * 30.0f;
-		mesh_->rot_ *= tnl::Quaternion::RotationAxis({ 0, 1, 0 }, tnl::ToRadian(rolling_speed_));
+		mesh_->rot_ *= tnl::Quaternion::RotationAxis(TANK_AXIS, tnl::ToRadian(rolling_speed_));
 	}
 
 	if (rolling_elapsed_ >= ROLLING_TIME && rolling_) {
@@ -332,16 +330,12 @@ void PlayerTank::TankRolling(float delta_time) {
 		rolling_elapsed_ = ROTATABLE_TIME;
 		rotatable_ = true;//回転可能をonに
 	}
+	//回転のゲージの右端の計算
+	spin_bar_right_ = SPIN_BAR_SPEED * rolling_elapsed_ * (DXE_WINDOW_WIDTH / ROLLING_TIME) + SPIN_GAUGE_POS.x;
 }
 
 float PlayerTank::EaseInOut(float t) {
 	// t は時間（0.0 から 1.0 の範囲で変化する値）
-
-
-	// 2乗のべき乗を使った急加速から減速への変化
-	/*float easedValue = t < 0.5 ? 2.0f * t * t : 1.0f - pow(-2.0f * t + 2.0f, 2) / 2.0f;
-
-	return easedValue;*/
 
 	// 等減速直線運動を利用した値の補間
 	float easedValue = tnl::DecelLerp(0, 1, 1, t);

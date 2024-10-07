@@ -37,6 +37,8 @@ private:
 	//テキストボックスの右下の座標
 	tnl::Vector2i TextBoxPosLast(tnl::Vector2i text_pos, std::string str);
 
+	//点滅の中央値(sin値で点滅させるため0)
+	const float FLASHED_CENTER_VALUE = 0.0f;
 	//タイトルのフォントの大きさ
 	const int RESULT_FONTSIZE = 150;
 	//通常フォントの大きさ
@@ -45,27 +47,37 @@ private:
 	const int CLICK_FONTSIZE = 40;
 	//テキストのカラーコード
 	const int TEXT_COLOR = 0xffd700;
+	//クリックテキストのカラーコード
+	const int CLICK_TEXT_COLOR = 0;
 	//タイトルの黒い背景の画像の透明度
-	const int TITLE_BACK_GFX_ALPHA = 50;
+	const int TITLE_BACK_GFX_TRANSPARENCY = 50;
+	//透明度が最大の値
+	const int TRANSPARENCY_MAX = 255;
 	//テキストの周りの黒背景の幅
 	const int TEXT_AROUND_WIDTH = 5;
 	//音量の大きさ
 	const int SND_VOL = 8000;
+	//点滅時間の値
+	const int FLASHED_VALUE = 5;
+	//全角文字が2つ分の幅を取るため調整する倍率
+	const int FULL_WIDTH_CHAR_RATIO = 2;
 	//タイトルの文字
-	const std::string TITLE_STR = "戦車でBANG!!!";
+	const std::string TITLE_TEXT = "戦車でBANG!!!";
 	//クリックの文字
-	const std::string CLICK_STR = "左クリックを押してネ";
+	const std::string CLICK_TEXT = "左クリックを押してネ";
 	//スタートの文字
-	const std::string START_STR = "スタート";
+	const std::string START_TEXT = "スタート";
 	//遊び方の文字
-	const std::string PLAY_RULE_STR = "遊び方";
+	const std::string PLAY_RULE_TEXT = "遊び方";
 	//閉じるの文字
-	const std::string CLOSE_STR = "戻る";
+	const std::string CLOSE_TEXT = "戻る";
 	//閉じるの文字
-	const std::string EASY_STR = "簡単";
+	const std::string EASY_TEXT = "簡単";
 	//閉じるの文字
-	const std::string HARD_STR = "難しい";
+	const std::string HARD_TEXT = "難しい";
 
+	//背景の表示座標
+	const tnl::Vector3 BACK_GROUND_POS = { 0.0f,0.0f,0.0f };
 	//タイトルのテキストの座標
 	const tnl::Vector2i TITLE_TEXT_POS = { 150,50 };
 	//スタートのテキストの座標

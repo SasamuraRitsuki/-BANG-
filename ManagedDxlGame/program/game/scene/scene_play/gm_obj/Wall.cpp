@@ -58,8 +58,8 @@ void Wall::update(float delta_time) {
 void Wall::draw(Shared<dxe::Camera> camera) {
 
 	wall1_mesh_->render(camera);
+
 	wall2_mesh_->render(camera);
-	
 	//‰œ
 	wall4_mesh_->render(camera);
 	

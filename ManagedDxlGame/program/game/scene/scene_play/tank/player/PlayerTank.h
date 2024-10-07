@@ -60,16 +60,18 @@ private:
 	MoveFloorState move_floor2_state_;
 
 
-	//スタート位置
-	const tnl::Vector3 FIRST_POS = { 0,50,0 };
+	//弾の画像の幅
+	const int BULLET_WIDTH = 64;
+	//スタート位置の向き
+	const tnl::Quaternion FIRST_ROT = { 0.0f, 0.0f, 0.0f, 0.0f };
+	//スタート位置の座標
+	const tnl::Vector3 FIRST_POS = { 0.0f, 50.0f, 0.0f };
 	//tankの形
 	const tnl::Vector3 TANK_FORM = { 1.0f, 0.75f, 1.0f };
-	//弾の画像の位置と大きさ
-	const tnl::Vector3 BULLET_POS = { 32, 50, 0.8f };
 	//HPのゲージ位置
 	const tnl::Vector2i HP_GAUGE_POS = { DXE_WINDOW_WIDTH/3 ,DXE_WINDOW_HEIGHT * 4 / 5 };
 	//スピンゲージ位置
-	const tnl::Vector2i SPIN_GAUGE_POS = { HP_GAUGE_POS.x ,576 + 60 };
+	const tnl::Vector2i SPIN_GAUGE_POS = { HP_GAUGE_POS.x ,636 };
 	//テキストの位置
 	const tnl::Vector2i HP_TEXT_POS = { HP_GAUGE_POS.x - 90, HP_GAUGE_POS.y };
 	const tnl::Vector2i SPIN_TEXT_POS = { SPIN_GAUGE_POS.x - 150, SPIN_GAUGE_POS.y - 5 };
@@ -81,21 +83,38 @@ private:
 	//上の白い背景の位置の左上の位置
 	const tnl::Vector2i UP_BACK_POS_FIRST = { 0,0 };
 	//上の白い背景の位置の右下の位置
-	const tnl::Vector2i UP_BACK_POS_LAST = { 64 * 5,104 };
+	const tnl::Vector2i UP_BACK_POS_LAST = { BULLET_WIDTH * 5,104 };
+	//バーの幅(横、縦)
+	const tnl::Vector2i BAR_WIDTH = { DXE_WINDOW_WIDTH/3, 40 };
+	//弾の画像の位置
+	const tnl::Vector2i BULLET_GFX_POS = { 32, 50};
+	//ニュートラルな状態を示す
+	const tnl::Vector2i INITIAL_MOVE_VECTOR = { 0, 0 };
+	//弾の画像の大きさの倍率
+	const float BULLET_GFX_SIZE_SCALE =  0.8f;
+	//弾の画像の回転の角度
+	const float BULLET_GFX_ANGLE = 0.0f;
 	//移動量
-	const float MOVE_SPEED = 5;
+	const float MOVE_SPEED = 5.0f;
 	//tankの大きさ
-	const float TANK_SIZE = 80;
+	const float TANK_SIZE = 80.0f;
 	//ジャンプ力
-	const float JUMP_VALUE = 10;
+	const float JUMP_VALUE = 10.0f;
 	//重力の初期値
 	const float GRAVITY_VALUE = 0.49f;
 	//回転時間
 	const float ROLLING_TIME = 0.8f;
 	//回転可能時間
-	const float ROTATABLE_TIME = ROLLING_TIME * 2;
+	const float ROTATABLE_TIME = ROLLING_TIME * 2.0f;
+	//スピンバーの増加の速度
+	const float SPIN_BAR_SPEED = 0.5f / 3.0f;
 	//hpが減りきる時間
-	const float HP_ELAPSED_LIMIT = 1;
+	const float HP_ELAPSED_LIMIT = 1.0f;
+
+	//ウィンドウの半分の幅
+	const int WINDOW_HALF_WIDTH = DXE_WINDOW_WIDTH / 2;
+	//ウィンドウの半分の高さ
+	const int WINDOW_HALF_HEIGHT = DXE_WINDOW_HEIGHT / 2;
 	//初期HP
 	const int TANK_HP = 3;
 	//落下死亡ライン
@@ -106,23 +125,29 @@ private:
 	const int ROLLING_SPEED = 25;
 	//テキストのカラーコード
 	const int TEXT_COLOR = 0;
+	//透明度が最大の値
+	const int TRANSPARENCY_MAX = 255;
+	//白い背景の透明度の値
+	const int TRANSPARENCY_WHITE_BACK = 100;
+	//角度のオフセットを示す定数
+	const int ANGLE_OFFSET = 90;
 
 	//マウスの座標
 	tnl::Vector3 mouse_pos_;
 	//重力による垂直方向の大きさの値
-	float jump_value_ = 0;
+	float jump_value_ = 0.0f;
 	//回転の経過時間
-	float rolling_elapsed_ = 0;
+	float rolling_elapsed_ = 0.0f;
 	//HPバーの右端
 	float hp_bar_right_ = static_cast<float>(HP_GAUGE_POS.x + HP_GAUGE_POS.x);
 	//スピンバーの右端
 	float spin_bar_right_ = static_cast<float>(SPIN_GAUGE_POS.x + HP_GAUGE_POS.x);
 	//回転の速さ
-	float rolling_speed_ = 0;
+	float rolling_speed_ = 0.0f;
 	//hpバーの経過時間
-	float hp_elapsed_ = 0;
+	float hp_elapsed_ = 0.0f;
 	//マウスへの角度
-	int angle_to_mouse_;
+	int angle_to_mouse_ = 0;
 	//マウスでクリックしたかどうか
 	bool clicked_ = false;
 	//1クリックで1発撃ったか

@@ -1,5 +1,9 @@
 #pragma once
 
+#ifndef M_PI
+#define M_PI 3.14159265358979323846
+#endif
+
 class Wall;
 class Floor;
 class Spawner;
@@ -19,12 +23,22 @@ protected:
 	//共通の音楽パスをロードする関数
 	void LoadCommonSound();
 
+	//戦車の回転の軸
+	const tnl::Vector3 TANK_AXIS = { 0.0f,1.0f,0.0f };
+	//戦車の進む方向(前方)
+	const tnl::Vector3 TANK_DIR = { 0.0f,0.0f,1.0f };
 	//重心円の半径
-	const float CENTROID_RADIUS = 20;
+	const float CENTROID_RADIUS = 20.0f;
 	//質量
-	const float MASS = 98;
+	const float MASS = 98.0f;
 	//摩擦
-	const float FRICTION = 1;
+	const float FRICTION = 1.0f;
+	//ラジアンを度に変換するための定数
+	const float RAD_TO_DEG = 180.0f / static_cast<float>(M_PI);
+	//死亡HP
+	const int TANK_DAED_HP = 0;
+	//ゲージの減少の補間回数
+	const int SMOOTHING_ITERATIONS = 0;
 
 	//------------------宣言のみ------------------
 	//メッシュ

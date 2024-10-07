@@ -5,7 +5,6 @@
 #include "../gm_obj/Bullet.h"
 #include"enemy_spawner/Spawner.h"
 #include"player/PlayerTank.h"
-
 bool TankBase::TryBulletToWallCollision(std::shared_ptr<Bullet> blt, std::shared_ptr<Wall> wall_) {
 	//’e‚Æ•Ç‚ª“–‚½‚Á‚½‚Æ‚«
 	if (tnl::IsIntersectAABB(blt->getBulletPos(), blt->getBulletSize(), wall_->getWall1Pos(), wall_->getWall1Size()) ||

@@ -48,13 +48,13 @@ public:
 
 private:
 	//端の壁の大きさ
-	const float WALL_SIZE = 100;
+	const float WALL_SIZE = 100.0f;
 
 	//--------------------------------壁1左-----------------------------------------
 	//壁の形
-	const tnl::Vector3 WALL1_FORM = { 1, 5, 27 };
+	const tnl::Vector3 WALL1_FORM = { 1.0f, 5.0f, 27.0f };
 	//壁の座標
-	const tnl::Vector3 wall1_pos_ = { -250,-45,1050 };
+	const tnl::Vector3 wall1_pos_ = { -250.0f,-45.0f,1050.0f };
 	//判定用の床の大きさ
 	tnl::Vector3 wall1_size_v;
 	//メッシュ
@@ -63,7 +63,7 @@ private:
 	//壁の形
 	const tnl::Vector3 WALL2_FORM = WALL1_FORM;
 	//壁の座標
-	const tnl::Vector3 wall2_pos_ = { 1550,-45,1050 };
+	const tnl::Vector3 wall2_pos_ = { 1550.0f,-45.0f,1050.0f };
 	//判定用の床の大きさ
 	tnl::Vector3 wall2_size_v;
 	//メッシュ
@@ -71,9 +71,9 @@ private:
 
 	//--------------------------------壁3手前-----------------------------------------
 	//壁の形
-	const tnl::Vector3 WALL3_FORM = { 17, 5, 1 };
+	const tnl::Vector3 WALL3_FORM = { 17.0f, 5.0f, 1.0f };
 	//壁の座標
-	const tnl::Vector3 wall3_pos_ = { 650,-45,-250 };
+	const tnl::Vector3 wall3_pos_ = { 650.0f, -45.0f, -250.0f };
 	//判定用の床の大きさ
 	tnl::Vector3 wall3_size_v;
 	//メッシュ
@@ -83,7 +83,7 @@ private:
 	//壁の形
 	const tnl::Vector3 WALL4_FORM = WALL3_FORM;
 	//壁の座標
-	const tnl::Vector3 wall4_pos_ = { 650,-45,2350 };
+	const tnl::Vector3 wall4_pos_ = { 650.0f, -45.0f, 2350.0f };
 	//判定用の床の大きさ
 	tnl::Vector3 wall4_size_v;
 	//メッシュ
@@ -91,9 +91,9 @@ private:
 
 	//--------------------------------壁5すぐそこの横壁-----------------------------------------
 	//壁の形
-	const tnl::Vector3 WALL5_FORM = { 10, 1.4f, 1 };
+	const tnl::Vector3 WALL5_FORM = { 10.0f, 1.4f, 1.0f };
 	//壁の座標
-	const tnl::Vector3 wall5_pos_ = { 302,50,300 };
+	const tnl::Vector3 wall5_pos_ = { 302.0f, 50.0f, 300.0f };
 	//判定用の床の大きさ
 	tnl::Vector3 wall5_size_v;
 	//メッシュ
@@ -101,9 +101,9 @@ private:
 
 	//--------------------------------仮想壁-----------------------------------------
 	//壁の形
-	const tnl::Vector3 WALL_VIRTUAL_FORM = { 19, 5, 8.4f };
+	const tnl::Vector3 WALL_VIRTUAL_FORM = { 19.0f, 5.0f, 8.4f };
 	//仮想壁の座標
-	const tnl::Vector3 wall_virtual_pos_ = { 650,-45,1264 };
+	const tnl::Vector3 wall_virtual_pos_ = { 650.0f, -45.0f, 1264.0f };
 	//判定用の床の大きさ
 	tnl::Vector3 wall_virtual_size_v;
 

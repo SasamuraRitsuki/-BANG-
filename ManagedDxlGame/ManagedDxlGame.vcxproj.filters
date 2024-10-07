@@ -263,6 +263,9 @@
     <ClCompile Include="program\game\scene\scene_play\result\Result.cpp">
       <Filter>program\[003] game\scene\scene_play\result</Filter>
     </ClCompile>
+    <ClCompile Include="program\game\scene\scene_play\SkyBox.cpp">
+      <Filter>program\[003] game\scene\scene_play</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="ManagedDxlGame.rc">
@@ -508,6 +511,9 @@
     </ClInclude>
     <ClInclude Include="program\game\scene\scene_play\result\Result.h">
       <Filter>program\[003] game\scene\scene_play\result</Filter>
+    </ClInclude>
+    <ClInclude Include="program\game\scene\scene_play\SkyBox.h">
+      <Filter>program\[003] game\scene\scene_play</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

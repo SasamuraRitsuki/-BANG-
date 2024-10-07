@@ -25,7 +25,7 @@ void GameManager::Destroy() {
 	delete GetInstance();
 }
 
-// next_scene_をセット
+//next_scene_をセット
 void GameManager::changeScene(std::shared_ptr<SceneBase> next_scene) {
 	next_scene_ = next_scene;
 }

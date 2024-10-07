@@ -7,15 +7,17 @@
 #include "tank/enemy_spawner/enemy/EnemyTank.h"
 #include "gm_obj/Floor.h"
 #include "gm_obj/Wall.h"
+#include "SkyBox.h"
 #include "result/Result.h"
 
 ScenePlay::ScenePlay(bool hard_mode) {
-	ChangeLightTypeDir(VGet(0.0f, -1.0f, 0.0f)); 
-	SetBackgroundColor(50, 50, 50);
+	//ポインタの作成
 	player_ = std::make_shared<PlayerTank>(); 
 	floor_ = std::make_shared<Floor>(hard_mode);
 	wall_ = std::make_shared<Wall>();
 	spawner_ = std::make_shared<Spawner>(hard_mode);
+	skybox_ = std::make_shared<SkyBox>(hard_mode);
+	camera_ = std::make_shared<dxe::Camera>(DXE_WINDOW_WIDTH, DXE_WINDOW_HEIGHT);
 
 	//自機に必要なポインタを渡す
 	player_->setFloorPointer(floor_);
@@ -26,29 +28,11 @@ ScenePlay::ScenePlay(bool hard_mode) {
 		enemy->setPlayerPointer(player_);
 		enemy->setWallPointer(wall_);
 	}
-
-	camera_ = std::make_shared<dxe::Camera>(DXE_WINDOW_WIDTH, DXE_WINDOW_HEIGHT);
-
+	//カメラの初期座標
 	camera_->pos_ = FIRST_CAMERA_POS;
-
-	//後ろの背景のスカイボックスの設定
-	SetDefaultLightParameter("directional_light_parameter.bin");
-	skybox_ = dxe::Mesh::CreateCubeMV(30000, 20, 20);
-	//難しいモードの時のスカイボックス
-	if (hard_mode) {
-		skybox_->setTexture(dxe::Texture::CreateFromFile("graphics/skybox/_skybox_a.png"));
-	}
-	//簡単モードの時のスカイボックス
-	else {
-		skybox_->setTexture(dxe::Texture::CreateFromFile("graphics/skybox/_skybox_c.png"));
-	}
-	skybox_->loadMaterial("material.bin");
-	skybox_->rot_ = tnl::Quaternion::RotationAxis({ 0, 1, 0 }, tnl::ToRadian(90));
-
 	//音楽を読み込む
 	bgm_snd_ = ResourceManager::GetInstance()->loadSound("sound/bgm/battle_bgm.mp3");
-
-	//bgmの生成
+	//bgmの再生
 	PlaySoundMem(bgm_snd_, DX_PLAYTYPE_LOOP);
 }
 
@@ -65,12 +49,12 @@ void ScenePlay::update(float delta_time) {
 bool ScenePlay::seqInGame(float delta_time) {
 	//自機の更新処理
 	player_->update(delta_time);
-	//自機の更新処理
+	//スポナーの更新処理
 	spawner_->update(delta_time);
-	//自機の更新処理
+	//床の更新処理
 	floor_->update(delta_time);
-	//スカイボックスをちょっとずつ動かす
-	skybox_->rot_ *= tnl::Quaternion::RotationAxis({ 0, 1, 0 }, tnl::ToRadian(0.06f));
+	//スカイボックスの更新処理
+	skybox_->update(delta_time);
 
 	//当たり判定の処理
 	CollisionSet();
@@ -82,8 +66,8 @@ bool ScenePlay::seqInGame(float delta_time) {
 	tnl::Vector3 NEXT_CAMERA_POS = { player_->getTankPos().x - FIRST_CAMERA_POS.x,FIRST_CAMERA_POS.y,player_->getTankPos().z + FIRST_CAMERA_POS.z };
 
 	//カメラ追従
-	camera_->pos_ -= (camera_->pos_ - NEXT_CAMERA_POS) * 0.1f;
-	camera_->target_ -= (camera_->target_ - tnl::Vector3{ player_->getTankPos().x, 0,player_->getTankPos().z }) * 0.1f;
+	camera_->pos_ -= (camera_->pos_ - NEXT_CAMERA_POS) * CAMERA_FOLLOW_SPEED;
+	camera_->target_ -= (camera_->target_ - tnl::Vector3{ player_->getTankPos().x, CAMERA_FOCUS_POS_Y, player_->getTankPos().z }) * CAMERA_FOLLOW_SPEED;
 	//カメラの更新処理
 	camera_->update();
 
@@ -112,7 +96,7 @@ bool ScenePlay::seqResult(float delta_time) {
 
 void ScenePlay::draw() {
 	//スカイボックスの描画
-	skybox_->render(camera_);
+	skybox_->draw(camera_);
 	//壁の描画
 	wall_->draw(camera_);
 	//床の描画
@@ -172,7 +156,6 @@ void ScenePlay::FloorCollision(
 
 	//自機と床が衝突した時
 	if (tnl::IsIntersectAABB(tank_pos, tank_size, floorpos, floorsize)) {
-		//DrawStringEx(100, 400, 0, "衝突");
 
 		//座標の補正
 		tnl::eCorrResAABB n = tnl::CorrectPositionAABB(
@@ -184,7 +167,8 @@ void ScenePlay::FloorCollision(
 			floorpos,
 			tnl::eCorrTypeAABB::PWRFL_B,
 			tnl::eCorrTypeAABB::PWRFL_B,
-			tnl::eCorrTypeAABB::PWRFL_B, 0.1f);
+			tnl::eCorrTypeAABB::PWRFL_B,
+			POST_COLLISION_GAP);
 
 		//着地時の処理
 		if (tnl::eCorrResAABB::UP == n) {
@@ -219,7 +203,6 @@ void ScenePlay::TankWallCollision(
 
 
 	if (tnl::IsIntersectAABB(tank_pos, tank_size, wall_pos, wall_size)) {
-		//DrawStringEx(100, 400, 0, "衝突");
 
 		tnl::eCorrResAABB n = tnl::CorrectPositionAABB(
 			tank_pos,
@@ -231,6 +214,6 @@ void ScenePlay::TankWallCollision(
 			tnl::eCorrTypeAABB::PWRFL_B,
 			tnl::eCorrTypeAABB::PWRFL_B,
 			tnl::eCorrTypeAABB::PWRFL_B,
-			0.1f);
+			POST_COLLISION_GAP);
 	}
 }

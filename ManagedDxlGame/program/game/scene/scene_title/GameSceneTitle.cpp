@@ -5,7 +5,6 @@
 #include "../../gm_mgr/ResourceManager.h"
 
 SceneTitle::SceneTitle() {
-	SetBackgroundColor(32, 32, 32);
 
 	//画像を読み込む
 	back_ground_gfx_ = ResourceManager::GetInstance()->loadGraph("graphics/title_back_ground.png");
@@ -21,6 +20,8 @@ SceneTitle::SceneTitle() {
 	start_box_gfx_ = dark_text_box_gfx_;
 	pray_rule_box_gfx_ = dark_text_box_gfx_;
 	close_box_gfx_ = dark_text_box_gfx_;
+	easy_box_gfx_ = dark_text_box_gfx_;
+	hard_box_gfx_ = dark_text_box_gfx_;
 	
 	//bgmを流す
 	PlaySoundMem(bgm_snd_, DX_PLAYTYPE_LOOP);
@@ -51,13 +52,13 @@ bool SceneTitle::seqHome(float delta_time) {
 	//時間経過
 	elapsed_ += delta_time;
 	//点滅用の計算
-	flashed_value_ = sin(elapsed_ * 5);
+	flashed_value_ = sin(elapsed_ * FLASHED_VALUE);
 
 	//スタートボタンの処理
-	UpdateButtonGraphics(START_TEXT_POS,START_STR, start_box_gfx_,
+	UpdateButtonGraphics(START_TEXT_POS,START_TEXT, start_box_gfx_,
 		enter_snd_, ChangeState::CHOICING);
 	//遊び方ボタンの処理
-	UpdateButtonGraphics(PLAY_RULE_TEXT_POS, PLAY_RULE_STR, pray_rule_box_gfx_,
+	UpdateButtonGraphics(PLAY_RULE_TEXT_POS, PLAY_RULE_TEXT, pray_rule_box_gfx_,
 		pray_rule_snd_, ChangeState::PLAY_RULE);
 
 	return true;
@@ -67,11 +68,11 @@ bool SceneTitle::seqPlayRule(float delta_time) {
 	if (sequence_.isStart()) {
 		//draw関数用に遊び方のフラグを立てる
 		play_rule_flag_ = true;
-		//「左クリックを押してネ」を非表示にする
-		flashed_value_ = 0;
+		//「左クリックを押してネ」を非表示状態にする
+		flashed_value_ = FLASHED_CENTER_VALUE;
 	}
 	//閉じるボタンの処理
-	UpdateButtonGraphics(PLAY_RULE_CLOSE_TEXT_POS, CLOSE_STR, close_box_gfx_,
+	UpdateButtonGraphics(PLAY_RULE_CLOSE_TEXT_POS, CLOSE_TEXT, close_box_gfx_,
 		pray_rule_snd_, ChangeState::HOME);
 
 	return true;
@@ -84,16 +85,16 @@ bool SceneTitle::seqChoicing(float delta_time) {
 		//draw関数用のHOME画面のフラグをおろす
 		home_flag_ = false;
 		//「左クリックを押してネ」を非表示にする
-		flashed_value_ = 0;
+		flashed_value_ = FLASHED_CENTER_VALUE;
 	}
 	//簡単ボタンの処理
-	UpdateButtonGraphics(EASY_TEXT_POS, EASY_STR, easy_box_gfx_,
+	UpdateButtonGraphics(EASY_TEXT_POS, EASY_TEXT, easy_box_gfx_,
 		enter_snd_, ChangeState::EASY_GAME);
 	//難しいボタンの処理
-	UpdateButtonGraphics(HARD_TEXT_POS, HARD_STR, hard_box_gfx_,
+	UpdateButtonGraphics(HARD_TEXT_POS, HARD_TEXT, hard_box_gfx_,
 		enter_snd_, ChangeState::HARD_GAME);
 	//閉じるボタンの処理
-	UpdateButtonGraphics(CHOICING_CLOSE_TEXT_POS, CLOSE_STR, close_box_gfx_,
+	UpdateButtonGraphics(CHOICING_CLOSE_TEXT_POS, CLOSE_TEXT, close_box_gfx_,
 		pray_rule_snd_, ChangeState::HOME);
 
 	return true;
@@ -101,52 +102,54 @@ bool SceneTitle::seqChoicing(float delta_time) {
 
 void SceneTitle::draw() {
 	//背景画像の描画
-	DrawGraphF(0,0, back_ground_gfx_,false);
+	DrawGraphF(BACK_GROUND_POS.x, BACK_GROUND_POS.y, back_ground_gfx_, false);
 
 	//透明度を上げる
-	SetDrawBlendMode(DX_BLENDMODE_ALPHA, TITLE_BACK_GFX_ALPHA);
+	SetDrawBlendMode(DX_BLENDMODE_ALPHA, TITLE_BACK_GFX_TRANSPARENCY);
 	//タイトルの裏の黒い背景
 	DrawExtendGraph(TITLE_BACK_POS_FIRST.x, TITLE_BACK_POS_FIRST.y,
 		TITLE_BACK_POS_LAST.x, TITLE_BACK_POS_LAST.y, dark_text_box_gfx_, false);
 	//遊び方を見ている時の後ろの背景
 	if (play_rule_flag_) {
-		DrawExtendGraph(0, 0, DXE_WINDOW_WIDTH, DXE_WINDOW_HEIGHT, dark_text_box_gfx_, false);
+		DrawExtendGraph(static_cast<int>(BACK_GROUND_POS.x), static_cast<int>(BACK_GROUND_POS.y),
+			DXE_WINDOW_WIDTH, DXE_WINDOW_HEIGHT, dark_text_box_gfx_, false);
 	}
 	//透明度を戻す
-	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 255);
+	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, TRANSPARENCY_MAX);
 
 	//タイトルの表示
 	SetFontSize(RESULT_FONTSIZE);
-	DrawStringEx(TITLE_TEXT_POS.x, TITLE_TEXT_POS.y, TEXT_COLOR, TITLE_STR.c_str());
-	
+	DrawStringEx(TITLE_TEXT_POS.x, TITLE_TEXT_POS.y, TEXT_COLOR, TITLE_TEXT.c_str());
+
 	//クリックテキストの表示
 	SetFontSize(CLICK_FONTSIZE);
-	if (flashed_value_ > 0) {
-		DrawStringEx(CLICK_TEXT_POS.x, CLICK_TEXT_POS.y, 0, CLICK_STR.c_str());
+	if (flashed_value_ > FLASHED_CENTER_VALUE) {
+		DrawStringEx(CLICK_TEXT_POS.x, CLICK_TEXT_POS.y, CLICK_TEXT_COLOR, CLICK_TEXT.c_str());
 	}
 
 	SetFontSize(NORMAL_FONTSIZE);
+	//ホーム画面の表示
 	if (home_flag_) {
 		//「スタート」のテキストボックス
-		CreateTextBox(START_TEXT_POS, START_STR, start_box_gfx_);
+		CreateTextBox(START_TEXT_POS, START_TEXT, start_box_gfx_);
 		//「遊び方」のテキストボックス
-		CreateTextBox(PLAY_RULE_TEXT_POS, PLAY_RULE_STR, pray_rule_box_gfx_);
+		CreateTextBox(PLAY_RULE_TEXT_POS, PLAY_RULE_TEXT, pray_rule_box_gfx_);
 	}
 	//遊び方の表示
 	if (play_rule_flag_) {
 		//遊び方の画像の表示
-		DrawGraphF(0, 0, play_rule_gfx_, true);
+		DrawGraphF(BACK_GROUND_POS.x, BACK_GROUND_POS.y, play_rule_gfx_, true);
 		//「閉じる」のテキストボックス
-		CreateTextBox(PLAY_RULE_CLOSE_TEXT_POS, CLOSE_STR, close_box_gfx_);
+		CreateTextBox(PLAY_RULE_CLOSE_TEXT_POS, CLOSE_TEXT, close_box_gfx_);
 	}
 	//選択画面の表示
 	if (choicing_flag_) {
 		//「簡単」のテキストボックス
-		CreateTextBox(EASY_TEXT_POS, EASY_STR, easy_box_gfx_);
+		CreateTextBox(EASY_TEXT_POS, EASY_TEXT, easy_box_gfx_);
 		//「難しい」のテキストボックス
-		CreateTextBox(HARD_TEXT_POS, HARD_STR, hard_box_gfx_);
+		CreateTextBox(HARD_TEXT_POS, HARD_TEXT, hard_box_gfx_);
 		//「閉じる」のテキストボックス
-		CreateTextBox(CHOICING_CLOSE_TEXT_POS, CLOSE_STR, close_box_gfx_);
+		CreateTextBox(CHOICING_CLOSE_TEXT_POS, CLOSE_TEXT, close_box_gfx_);
 	}
 }
 
@@ -227,6 +230,7 @@ tnl::Vector2i SceneTitle::TextBoxPosFirst(tnl::Vector2i text_pos) {
 }
 
 tnl::Vector2i SceneTitle::TextBoxPosLast(tnl::Vector2i text_pos, std::string str) {
-	return { text_pos.x + (NORMAL_FONTSIZE * static_cast<int>(str.length()) / 2) + 
+	//テキストボックスの右下の座標
+	return { text_pos.x + (NORMAL_FONTSIZE * static_cast<int>(str.length()) / FULL_WIDTH_CHAR_RATIO) +
 		TEXT_AROUND_WIDTH, text_pos.y + NORMAL_FONTSIZE + TEXT_AROUND_WIDTH };
 }

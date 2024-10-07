@@ -49,13 +49,13 @@ Floor::~Floor() {
 }
 
 void Floor::update(float delta_time) {
-	elapsed_ += delta_time;
+	flashed_value_ += delta_time;
 
-	delta_move_floor1_distance_ = sin(elapsed_ * move_floor_speed_) * MOVE_FLOOR_DISTANCE;
+	delta_move_floor1_distance_ = sin(flashed_value_ * move_floor_speed_) * MOVE_FLOOR_DISTANCE;
 
 	move_floor1_pos_.x = MOVE_FLOOR1_POS.x + delta_move_floor1_distance_;
 
-	delta_move_floor2_distance_ = -sin(elapsed_ * move_floor_speed_) * MOVE_FLOOR_DISTANCE;
+	delta_move_floor2_distance_ = -sin(flashed_value_ * move_floor_speed_) * MOVE_FLOOR_DISTANCE;
 
 	move_floor2_pos_.x = MOVE_FLOOR2_POS.x + delta_move_floor2_distance_;
 

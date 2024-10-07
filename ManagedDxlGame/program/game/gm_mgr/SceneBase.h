@@ -7,5 +7,5 @@ public:
 
 protected:
 	//bgm‚Ì‰¹ŠyƒpƒX
-	int bgm_snd_;
+	int bgm_snd_ = 0;
 };
