@@ -14,7 +14,7 @@ DXライブラリを使用したC++
 （ゲーム内に操作説明あり）
 
 ・exeファイルの場所
-作品_戦車でBANG!!!\ManagedDxlGame\ManagedDxlGame.exe
+ManagedDxlGame\ManagedDxlGame.exe
 
 
 	
